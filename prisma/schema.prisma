@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// --- TABLA DE USUARIOS ---
+model Usuario {
+  id        String   @id @default(cuid())
+  usuario   String   @unique
+  password  String   
+  nombre    String
+  rol       String   @default("FUNCIONARIO") // FUNCIONARIO u OPERATIVO
+  createdAt DateTime @default(now())
+  reclamos  Reclamo[]
+}
+
+enum Rol {
+  FUNCIONARIO // Ellos: Llenan el formulario inicial
+  OPERATIVO   // Ustedes: Buscan la data externa y completan
+}
+
+// --- TABLA DE RECLAMOS ---
+model Reclamo {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  nroReclamo       String   @unique
+  nroTicket        String
+  tipoDocumento    String   
+  documentoCliente String
+  importe          Float
+  fechaTrx         String   
+  estadoTicket     String?  
+  idUnico          String?  
+  codDevolucion    String?  
+  completado       Boolean  @default(false)
+  funcionarioId    String
+  usuario          Usuario? @relation(fields: [funcionarioId], references: [id])
+}
